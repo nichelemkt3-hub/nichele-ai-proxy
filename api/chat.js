@@ -1,136 +1,87 @@
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || "EMPTY",
 });
 
 const BASE_CONHECIMENTO = `
-VOCÊ É UM ASSISTENTE OFICIAL DA NICHELE MATERIAIS DE CONSTRUÇÃO.
+Você é um assistente oficial da NICHELE MATERIAIS DE CONSTRUÇÃO.
 Responda APENAS com base nas informações abaixo.
-Se a pergunta não estiver claramente respondida aqui, diga:
+Se não encontrar a resposta, diga:
 "Não encontrei essa informação. Fale conosco no WhatsApp: (41) 99755-0040"
 
-====================
-PERGUNTAS DO SORTEIO
-====================
-
-Pergunta: Até quando vai a campanha? 
-Resposta: Período da Promoção: De 20.01 a 17.12
-Período de Participação: De 20.01 a 14.12
+Pergunta: Até quando vai a campanha?
+Resposta: A campanha ocorre de 20/01 a 17/12, com participação até 14/12.
 
 Pergunta: Quais lojas participam?
-Resposta: Essa modalidade vale para TODAS as lojas Nichele Materiais de Construção + Nichele Tintas. Não vale para a loja Vero Acabamentos. 
+Resposta: Todas as lojas Nichele Materiais de Construção e Nichele Tintas. Não vale para Vero Acabamentos.
 
-Pergunta: Quem pode participar? 
-Resposta: Pessoas físicas e pessoas jurídicas, maiores de 18 anos, com CPF válido, residentes e domiciliadas em território nacional. 
-No caso de participação de pessoa jurídica, deverá ser informado no momento do cadastro a razão social e o CPF do representante legal conforme indicado no contrato social ou estatuto da empresa. 
+Pergunta: Quem pode participar?
+Resposta: Pessoas físicas e jurídicas maiores de 18 anos, com CPF válido e residentes no Brasil.
 
-Pergunta: Quem não pode participar? 
-Resposta: Pessoas físicas e pessoas jurídicas sem cadastro CPF válido e/ou não residentes em território nacional; 
-Menores de 18 anos; 
-Sócios, diretores e funcionários da empresa mandatária e empresas aderentes, bem como seus cônjuges e parentes de 1º grau (pais e filhos); 
+Pergunta: Quem não pode participar?
+Resposta: Menores de 18 anos, pessoas sem CPF válido, não residentes no Brasil e funcionários da empresa.
 
 Pergunta: Como participar?
-Resposta: Realizar compras de no mínimo R$2000,00 em produtos nas lojas físicas participantes, e-commerce ou televendas. Realizar o cadastro completo e correto no hotsite ou whatsapp da promoção, informando todos os dados obrigatórios. 
+Resposta: Compras a partir de R$ 2.000,00 e cadastro completo no hotsite ou WhatsApp.
 
-Pergunta: Saldo de compra 
-Resposta: Havendo saldo no valor da compra que não complete os múltiplos de R$2.000,00, este saldo acumulado em compras futuras para geração de um novo Número da Sorte.
+Pergunta: Onde vejo meu número da sorte?
+Resposta: Pelo hotsite aniversarionichele.com.br ou WhatsApp.
 
-Pergunta: Onde consigo ver meu número da sorte? 
-Resposta: O número da sorte gerado e atribuído a cada participante poderá ser consultado pelo cliente por meio do hotsite www.aniversarionichele.com.br ou no Whatsapp 41 99755-0040, fazendo o login com cpf e senha. 
-
-Pergunta: Quando acontecem os sorteios? 
-Resposta: Os sorteios acontecem sempre nas quartas-feiras ou nos sábados e o resultado é divulgado na quinta-feira ou na segunda-feira no hotsite da campanha. 
-Acontecerão nos dias: 24/01/2026, 28/01/2026, 04/02/2026, 11/02/2026, 18/02/2026, 25/02/2026, 04/03/2026, 11/03/2026, 18/03/2026, 25/03/2026, 01/04/2026, 08/04/2026, 15/04/2026, 22/04/2026, 29/04/2026, 06/05/2026, 13/05/2026, 20/05/2026, 27/05/2026, 03/06/2026, 10/06/2026, 17/06/2026, 24/06/2026, 01/07/2026, 08/07/2026, 15/07/2026, 22/07/2026, 29/07/2026, 05/08/2026, 08/08/2025, 12/08/2026, 15/08/2026, 19/08/2026, 22/08/2026, 26/08/2026, 29/08/2026, 02/09/2026, 09/09/2026, 16/09/2026, 23/09/2026, 30/09/2026, 07/10/2026, 14/10/2026, 21/10/2026, 28/10/2026, 04/11/2026, 11/11/2026, 18/11/2026, 25/11/2026, 02/12/2026 e 16/12/2026 e serão válidos pelos resultados das extrações da Loteria Federal.
-
-Pergunta: Ganhei o sorteio semanal, ainda participo dos próximos sorteios?
-Resposta: Não, cada participante poderá ser contemplado uma única vez na promoção modalidade assemelhado a sorteio, cujo controle será feito pelo CPF. Caso o participante contemplado seja sorteado mais de uma vez no sorteio, valerá para fins de premiação apenas o primeiro mpremio. 
-
-Pergunta: Quando será realizado o sorteio extra? 
-Resposta: No dia 16/12/2026. 
-
-Pergunta: Comunicação ganhadores 
-Resposta: Os contemplados serão comunicados sobre a premiação através do número do telefone registrado no cadastro realizado.
-
-Pergunta: Entrega do Prêmio 
-Resposta: A entrega do prêmio será realizada exclusivamente em nome da pessoa física cadastrada no website da promoção, sendo obrigatória a coincidência entre o CPF informado no cadastro e o CPF do contemplado, não sendo admitida, em hipóteses alguma, a transferência do prêmio a terceiros.
-A premiação é pessoal e intransferível, devendo o contemplado apresentar documento oficial com foto e CPF para a retirada do prêmio.
-O prêmio deverá ser retirado presencialmente na filial de Xaxim, em local, data e horário previamente informados ao contemplado pela promotora da campanha.
-Os prêmios oferecidos nesta promoção não poderão ser trocados por dinheiro ou por qualquer outro produto. Não cabe ao participante contemplado e/ou ao seu responsável/representante legal discutir ou redefinir as condições e premissas da promoção ou do prêmio.
-
-====================
-PERGUNTAS DAS ROLETAS
-====================
-
-Pergunta: Até quando vai a campanha? 
-Resposta: A promoção será válida no período de 20/01/2026 a 23/12/2026, ou até o término dos prêmios, o que ocorrer primeiro. 
-
-Pergunta: Quais lojas participam?
-Resposta: Essa modalidade vale para TODAS as lojas Nichele Materiais de Construção. Não vale para as lojas Nichele Tintas e Vero Acabamentos. 
-
-Pergunta: Quem pode participar? 
-Resposta: Pessoas físicas e pessoas jurídicas, maiores de 18 anos, com CPF válido, residentes e domiciliadas em território nacional. 
-No caso de participação de pessoa jurídica, deverá ser informado no momento do cadastro a razão social e o CPF do representante legal conforme indicado no contrato social ou estatuto da empresa. 
-
-Pergunta: Quem não pode participar? 
-Resposta: Pessoas físicas e pessoas jurídicas sem cadastro CPF válido e/ou não residentes em território nacional; 
-Menores de 18 anos; 
-Sócios, diretores e funcionários da empresa mandatária e empresas aderentes, bem como seus cônjuges e parentes de 1º grau (pais e filhos); 
-
-Pergunta: Como participar?
-Resposta: Realizar compras de no mínimo R$2000,00 em produtos nas lojas físicas participantes, e-commerce ou televendas. Realizar o cadastro completo e correto no hotsite ou whatsapp da promoção, informando todos os dados obrigatórios. 
-
-Pergunta: Giro da Sorte?
-Resposta: O cliente que efetuar compras acima de R$ 2.000,00 (dois mil reais) em produtos nas lojas físicas participantes, e-commerce ou televendas da NICHELE MATERIAIS DE CONSTRUÇÃO, durante o período 20/01/2026 a 23/12/2026, terá direito a 01 (um) Giro da Sorte. A geração do Giro da Sorte será limitada a 01(um) giro por compra (nota/cupom fiscal). 
-
-Pergunta: Onde consigo ver o resultado do giro? 
-Resposta: Poderá ser consultado pelo cliente por meio do hotsite www.aniversarionichele.com.br ou no Whatsapp 41 99755-0040, fazendo o login com cpf e senha.
-
-Pergunta: Retirada do prêmio
-Resposta: Os prêmios serão entregues sem qualquer ônus ao contemplado, em nome da pessoa devidamente cadastrada no hotsite www. aniversarionichele.com.br ou no WhatsApp +55 (41) 99755-0040. A premiação é pessoal, intransferível e não poderá, em hipótese alguma, ser convertida em dinheiro. 
-
-O contemplado que realizar a compra em loja física deverá retirar o prêmio na própria loja onde efetuou a compra, no prazo de até 180 dias, contados a partir da data da efetiva contemplação. 
-
-Nas compras realizadas por meio do e-commerce, o prêmio será enviado juntamente com o pedido. 10.2.2. Já nas compras efetuadas por meio do Televendas, o contemplado deverá combinar previamente a retirada do prêmio em uma loja física de sua preferência, dentre as unidades participantes, observado o prazo máximo de 180 dia, contados da data da contemplação.
-
-O prazo de prescrição do direito aos prêmios é de 180 (cento e oitenta) dias, contados a partir da extração da Loteria Federal, de acordo com o artigo 6º do Decreto 70.951/72.
+Pergunta: Ganhei um sorteio, continuo participando?
+Resposta: Não. Cada participante pode ser contemplado apenas uma vez.
 `;
 
 export default async function handler(req, res) {
+  // 🔓 CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método não permitido" });
   }
 
   try {
-    const { message } = req.body;
+    const body = req.body || {};
+    const pergunta = body.message || body.question;
 
-    if (!message) {
-      return res.status(400).json({ error: "Pergunta não informada" });
+    if (!pergunta) {
+      return res.status(400).json({
+        reply: "Pergunta não informada. Fale conosco no WhatsApp: (41) 99755-0040",
+      });
+    }
+
+    // 🔹 Se não tiver chave da OpenAI, responde direto da base
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(200).json({
+        reply:
+          "⚠️ IA temporariamente indisponível. Fale conosco no WhatsApp: (41) 99755-0040",
+      });
     }
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: BASE_CONHECIMENTO,
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
       temperature: 0.2,
+      messages: [
+        { role: "system", content: BASE_CONHECIMENTO },
+        { role: "user", content: pergunta },
+      ],
     });
 
     const resposta =
-      completion.choices[0]?.message?.content ||
-      "Erro técnico. Fale conosco no WhatsApp: (41) 99755-0040";
+      completion.choices?.[0]?.message?.content ||
+      "Não encontrei essa informação. Fale conosco no WhatsApp: (41) 99755-0040";
 
-    res.status(200).json({ reply: resposta });
-  } catch (error) {
-    res.status(500).json({
-      reply: "Erro técnico. Fale conosco no WhatsApp: (41) 99755-0040",
+    return res.status(200).json({ reply: resposta });
+  } catch (err) {
+    return res.status(200).json({
+      reply:
+        "Erro técnico no momento. Fale conosco no WhatsApp: (41) 99755-0040",
     });
   }
 }
