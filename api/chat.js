@@ -1,8 +1,4 @@
-import OpenAI from "openai";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "EMPTY",
-});
+import fetch from "node-fetch";
 
 const BASE_CONHECIMENTO = `
 Você é um assistente oficial da NICHELE MATERIAIS DE CONSTRUÇÃO.
@@ -38,13 +34,9 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
-  if (req.method !== "POST") {
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST")
     return res.status(405).json({ error: "Método não permitido" });
-  }
 
   try {
     const body = req.body || {};
@@ -52,34 +44,41 @@ export default async function handler(req, res) {
 
     if (!pergunta) {
       return res.status(400).json({
-        reply: "Pergunta não informada. Fale conosco no WhatsApp: (41) 99755-0040",
-      });
-    }
-
-    // 🔹 Se não tiver chave da OpenAI, responde direto da base
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(200).json({
         reply:
-          "⚠️ IA temporariamente indisponível. Fale conosco no WhatsApp: (41) 99755-0040",
+          "Pergunta não informada. Fale conosco no WhatsApp: (41) 99755-0040",
       });
     }
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      temperature: 0.2,
-      messages: [
-        { role: "system", content: BASE_CONHECIMENTO },
-        { role: "user", content: pergunta },
-      ],
-    });
+    // 🔹 Chamada para RapidAPI OpenAI
+    const rapidResponse = await fetch(
+      "https://openai80.p.rapidapi.com/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
+          "X-RapidAPI-Host": "openai80.p.rapidapi.com",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          temperature: 0.2,
+          messages: [
+            { role: "system", content: BASE_CONHECIMENTO },
+            { role: "user", content: pergunta },
+          ],
+        }),
+      }
+    );
+
+    const data = await rapidResponse.json();
 
     const resposta =
-      completion.choices?.[0]?.message?.content ||
+      data.choices?.[0]?.message?.content ||
       "Não encontrei essa informação. Fale conosco no WhatsApp: (41) 99755-0040";
 
     return res.status(200).json({ reply: resposta });
   } catch (err) {
-    return res.status(200).json({
+    return res.status(500).json({
       reply:
         "Erro técnico no momento. Fale conosco no WhatsApp: (41) 99755-0040",
     });
